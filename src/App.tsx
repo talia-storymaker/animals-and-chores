@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -17,7 +17,10 @@ const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#aa3bff",
+      main: "#069b3a",
+    },
+    background: {
+      default: "#ffe0f3",
     },
   },
   typography: {
@@ -36,29 +39,91 @@ interface Chore {
 }
 
 const chores: Chore[] = [
-  { name: "loadDishwasher", label: "Load dishwasher", category: "general", doableByJacob: true },
-  { name: "emptyDishwasher", label: "Empty dishwasher", category: "general", doableByJacob: true },
+  {
+    name: "loadDishwasher",
+    label: "Load dishwasher",
+    category: "general",
+    doableByJacob: true,
+  },
+  {
+    name: "emptyDishwasher",
+    label: "Empty dishwasher",
+    category: "general",
+    doableByJacob: true,
+  },
   { name: "washLaundry", label: "Put laundry in washer", category: "general" },
   { name: "dryLaundry", label: "Put laundry in dryer", category: "general" },
-  { name: "feedSeanMorning", label: "Feed Sean (morning)", category: "animal", animalSubcategory: "feeding" },
-  { name: "feedFenyxMorning", label: "Feed Fenyx (morning)", category: "animal", animalSubcategory: "feeding" },
-  { name: "feedSeanEvening", label: "Feed Sean (evening)", category: "animal", animalSubcategory: "feeding" },
-  { name: "feedFenyxEvening", label: "Feed Fenyx (evening)", category: "animal", animalSubcategory: "feeding" },
-  { name: "feedGhost", label: "Feed Ghost", category: "animal", animalSubcategory: "feeding" },
-  { name: "litterboxBehindCouch", label: "Behind-couch litterbox", category: "animal", animalSubcategory: "litterbox" },
-  { name: "litterboxBedroomCloset", label: "Bedroom closet litterbox", category: "animal", animalSubcategory: "litterbox" },
-  { name: "litterboxLaundryRoom", label: "Laundry room litterbox", category: "animal", animalSubcategory: "litterbox" },
+  {
+    name: "feedSeanMorning",
+    label: "Feed Sean (morning)",
+    category: "animal",
+    animalSubcategory: "feeding",
+  },
+  {
+    name: "feedFenyxMorning",
+    label: "Feed Fenyx (morning)",
+    category: "animal",
+    animalSubcategory: "feeding",
+  },
+  {
+    name: "feedSeanEvening",
+    label: "Feed Sean (evening)",
+    category: "animal",
+    animalSubcategory: "feeding",
+  },
+  {
+    name: "feedFenyxEvening",
+    label: "Feed Fenyx (evening)",
+    category: "animal",
+    animalSubcategory: "feeding",
+  },
+  {
+    name: "feedGhost",
+    label: "Feed Ghost",
+    category: "animal",
+    animalSubcategory: "feeding",
+  },
+  {
+    name: "litterboxBehindCouch",
+    label: "Behind-couch litterbox",
+    category: "animal",
+    animalSubcategory: "litterbox",
+  },
+  {
+    name: "litterboxBedroomCloset",
+    label: "Bedroom closet litterbox",
+    category: "animal",
+    animalSubcategory: "litterbox",
+  },
+  {
+    name: "litterboxLaundryRoom",
+    label: "Laundry room litterbox",
+    category: "animal",
+    animalSubcategory: "litterbox",
+  },
 ];
 
-type ChoreName = typeof chores[number]["name"];
+type ChoreName = (typeof chores)[number]["name"];
 type ChoreStatus = Record<ChoreName, string>;
 
 const initialChoresStatus: ChoreStatus = Object.fromEntries(
-  chores.map((chore) => [chore.name, ""])
+  chores.map((chore) => [chore.name, ""]),
 ) as ChoreStatus;
 
 function App() {
   const [choresStatus, setChoresStatus] = useState(initialChoresStatus);
+
+  useEffect(() => {
+    chores.forEach((chore) => {
+      const savedValue = localStorage.getItem(chore.name);
+      if (savedValue) {
+        setChoresStatus((prev) => ({
+          ...prev,
+          [chore.name]: savedValue,
+        }));
+      }
+    });
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -66,6 +131,7 @@ function App() {
       ...prev,
       [name]: value,
     }));
+    localStorage.setItem(name, value);
   };
 
   return (
@@ -78,7 +144,7 @@ function App() {
           gutterBottom
           sx={{ mb: 4, fontWeight: "bold" }}
         >
-          Chore Tracker
+          Animals and Chores: A Tracker
         </Typography>
 
         <Box sx={{ mb: 4 }}>
@@ -92,7 +158,7 @@ function App() {
                 component="legend"
                 sx={{ mb: 2, fontSize: "1.1rem", fontWeight: 600 }}
               >
-                Hunter/Jacob/Talia Chores
+                Jacob, Talia, & Hunter
               </FormLabel>
               <Stack spacing={2}>
                 {chores.map((chore) => {
@@ -102,6 +168,7 @@ function App() {
                         key={chore.name}
                         name={chore.name}
                         label={chore.label}
+                        value={choresStatus[chore.name]}
                         changeHandler={handleChange}
                       />
                     );
@@ -118,7 +185,7 @@ function App() {
                 component="legend"
                 sx={{ mb: 2, fontSize: "1.1rem", fontWeight: 600 }}
               >
-                Hunter/Talia Chores
+                Talia & Hunter
               </FormLabel>
               <Stack spacing={2}>
                 {chores.map((chore) => {
@@ -128,6 +195,7 @@ function App() {
                         key={chore.name}
                         name={chore.name}
                         label={chore.label}
+                        value={choresStatus[chore.name]}
                         changeHandler={handleChange}
                       />
                     );
@@ -160,6 +228,7 @@ function App() {
                         key={chore.name}
                         name={chore.name}
                         label={chore.label}
+                        value={choresStatus[chore.name]}
                         changeHandler={handleChange}
                       />
                     );
@@ -186,6 +255,7 @@ function App() {
                         key={chore.name}
                         name={chore.name}
                         label={chore.label}
+                        value={choresStatus[chore.name]}
                         changeHandler={handleChange}
                       />
                     );
