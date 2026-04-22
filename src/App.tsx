@@ -1,0 +1,204 @@
+import { useState } from "react";
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  FormControl,
+  FormLabel,
+  Stack,
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+} from "@mui/material";
+import Chore from "./components/Chore";
+
+const theme = createTheme({
+  palette: {
+    mode: "light",
+    primary: {
+      main: "#aa3bff",
+    },
+  },
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+  },
+});
+
+type category = "general" | "animal";
+type animalSubcategory = "feeding" | "litterbox";
+interface Chore {
+  name: string;
+  label: string;
+  category: category;
+  doableByJacob?: boolean;
+  animalSubcategory?: animalSubcategory;
+}
+
+const chores: Chore[] = [
+  { name: "loadDishwasher", label: "Load dishwasher", category: "general", doableByJacob: true },
+  { name: "emptyDishwasher", label: "Empty dishwasher", category: "general", doableByJacob: true },
+  { name: "washLaundry", label: "Put laundry in washer", category: "general" },
+  { name: "dryLaundry", label: "Put laundry in dryer", category: "general" },
+  { name: "feedSeanMorning", label: "Feed Sean (morning)", category: "animal", animalSubcategory: "feeding" },
+  { name: "feedFenyxMorning", label: "Feed Fenyx (morning)", category: "animal", animalSubcategory: "feeding" },
+  { name: "feedSeanEvening", label: "Feed Sean (evening)", category: "animal", animalSubcategory: "feeding" },
+  { name: "feedFenyxEvening", label: "Feed Fenyx (evening)", category: "animal", animalSubcategory: "feeding" },
+  { name: "feedGhost", label: "Feed Ghost", category: "animal", animalSubcategory: "feeding" },
+  { name: "litterboxBehindCouch", label: "Behind-couch litterbox", category: "animal", animalSubcategory: "litterbox" },
+  { name: "litterboxBedroomCloset", label: "Bedroom closet litterbox", category: "animal", animalSubcategory: "litterbox" },
+  { name: "litterboxLaundryRoom", label: "Laundry room litterbox", category: "animal", animalSubcategory: "litterbox" },
+];
+
+type ChoreName = typeof chores[number]["name"];
+type ChoreStatus = Record<ChoreName, string>;
+
+const initialChoresStatus: ChoreStatus = Object.fromEntries(
+  chores.map((chore) => [chore.name, ""])
+) as ChoreStatus;
+
+function App() {
+  const [choresStatus, setChoresStatus] = useState(initialChoresStatus);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setChoresStatus((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Typography
+          variant="h3"
+          component="h1"
+          gutterBottom
+          sx={{ mb: 4, fontWeight: "bold" }}
+        >
+          Chore Tracker
+        </Typography>
+
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 2 }}>
+            General Chores
+          </Typography>
+
+          <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+            <FormControl fullWidth component="fieldset">
+              <FormLabel
+                component="legend"
+                sx={{ mb: 2, fontSize: "1.1rem", fontWeight: 600 }}
+              >
+                Hunter/Jacob/Talia Chores
+              </FormLabel>
+              <Stack spacing={2}>
+                {chores.map((chore) => {
+                  if (chore.doableByJacob) {
+                    return (
+                      <Chore
+                        key={chore.name}
+                        name={chore.name}
+                        label={chore.label}
+                        changeHandler={handleChange}
+                      />
+                    );
+                  }
+                  return null;
+                })}
+              </Stack>
+            </FormControl>
+          </Paper>
+
+          <Paper elevation={2} sx={{ p: 3 }}>
+            <FormControl fullWidth component="fieldset">
+              <FormLabel
+                component="legend"
+                sx={{ mb: 2, fontSize: "1.1rem", fontWeight: 600 }}
+              >
+                Hunter/Talia Chores
+              </FormLabel>
+              <Stack spacing={2}>
+                {chores.map((chore) => {
+                  if (!chore.doableByJacob && chore.category === "general") {
+                    return (
+                      <Chore
+                        key={chore.name}
+                        name={chore.name}
+                        label={chore.label}
+                        changeHandler={handleChange}
+                      />
+                    );
+                  }
+                  return null;
+                })}
+              </Stack>
+            </FormControl>
+          </Paper>
+        </Box>
+
+        <Box>
+          <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 2 }}>
+            Animal Chores
+          </Typography>
+
+          <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
+            <FormControl fullWidth component="fieldset">
+              <FormLabel
+                component="legend"
+                sx={{ mb: 2, fontSize: "1.1rem", fontWeight: 600 }}
+              >
+                Feeding
+              </FormLabel>
+              <Stack spacing={2}>
+                {chores.map((chore) => {
+                  if (chore.animalSubcategory === "feeding") {
+                    return (
+                      <Chore
+                        key={chore.name}
+                        name={chore.name}
+                        label={chore.label}
+                        changeHandler={handleChange}
+                      />
+                    );
+                  }
+                  return null;
+                })}
+              </Stack>
+            </FormControl>
+          </Paper>
+
+          <Paper elevation={2} sx={{ p: 3 }}>
+            <FormControl fullWidth component="fieldset">
+              <FormLabel
+                component="legend"
+                sx={{ mb: 2, fontSize: "1.1rem", fontWeight: 600 }}
+              >
+                Litterboxes
+              </FormLabel>
+              <Stack spacing={2}>
+                {chores.map((chore) => {
+                  if (chore.animalSubcategory === "litterbox") {
+                    return (
+                      <Chore
+                        key={chore.name}
+                        name={chore.name}
+                        label={chore.label}
+                        changeHandler={handleChange}
+                      />
+                    );
+                  }
+                  return null;
+                })}
+              </Stack>
+            </FormControl>
+          </Paper>
+        </Box>
+      </Container>
+    </ThemeProvider>
+  );
+}
+
+export default App;
