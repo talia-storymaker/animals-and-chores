@@ -54,6 +54,7 @@ export default function Chore({
         value={dayDone}
         onChange={changeHandler}
         variant="outlined"
+        slotProps={{ htmlInput: { max: format(new Date(), "yyyy-MM-dd") }}}
       />
       <Button
         variant="contained"
@@ -68,6 +69,7 @@ export default function Chore({
 
           changeHandler?.(fakeEvent);
         }}
+        disabled={isSameDay(dayDoneDate, new Date())}
       >
         ✓ Done today
       </Button>
