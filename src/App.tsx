@@ -29,7 +29,7 @@ const theme = createTheme({
 });
 
 type category = "general" | "animal";
-type animalSubcategory = "feedCats" | "litterbox" | "ghost";
+type animalSubcategory = "feedCats" | "litterbox" | "ghost" | "misc";
 interface Chore {
   name: string;
   label: string;
@@ -54,7 +54,18 @@ const chores: Chore[] = [
   },
   { name: "washLaundry", label: "Put laundry in washer", category: "general" },
   { name: "dryLaundry", label: "Put laundry in dryer", category: "general" },
-  { name: "foldLaundry", label: "Fold laundry", category: "general", dueInXDays: 2},
+  {
+    name: "foldLaundry",
+    label: "Fold laundry",
+    category: "general",
+    dueInXDays: 2,
+  },
+  {
+    name: "changeOil",
+    label: "Change oil",
+    category: "general",
+    dueInXDays: 30,
+  },
   {
     name: "feedSeanMorning",
     label: "Feed Sean (morning)",
@@ -113,6 +124,13 @@ const chores: Chore[] = [
     category: "animal",
     animalSubcategory: "litterbox",
     dueInXDays: 2,
+  },
+  {
+    name: "feedRoaches",
+    label: "Feed roaches",
+    category: "animal",
+    animalSubcategory: "misc",
+    dueInXDays: 7,
   },
 ];
 
@@ -283,7 +301,7 @@ function App() {
             </FormControl>
           </Paper>
 
-          <Paper elevation={2} sx={{ p: 3 }}>
+          <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
             <FormControl fullWidth component="fieldset">
               <FormLabel
                 component="legend"
@@ -294,6 +312,34 @@ function App() {
               <Stack spacing={2}>
                 {chores.map((chore) => {
                   if (chore.animalSubcategory === "ghost") {
+                    return (
+                      <Chore
+                        key={chore.name}
+                        name={chore.name}
+                        label={chore.label}
+                        dayDone={choresStatus[chore.name]}
+                        changeHandler={handleChange}
+                        dueInXDays={chore.dueInXDays}
+                      />
+                    );
+                  }
+                  return null;
+                })}
+              </Stack>
+            </FormControl>
+          </Paper>
+
+          <Paper elevation={2} sx={{ p: 3 }}>
+            <FormControl fullWidth component="fieldset">
+              <FormLabel
+                component="legend"
+                sx={{ mb: 2, fontSize: "1.1rem", fontWeight: 600 }}
+              >
+                Misc.
+              </FormLabel>
+              <Stack spacing={2}>
+                {chores.map((chore) => {
+                  if (chore.animalSubcategory === "misc") {
                     return (
                       <Chore
                         key={chore.name}
