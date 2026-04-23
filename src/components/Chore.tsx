@@ -22,6 +22,17 @@ export default function Chore({
       ? new Date()
       : addDays(baseDate, dueInXDays || 1);
 
+  function dueStatus() {
+    switch (true) {
+      case dueDate < new Date():
+        return <Alert severity="error">Overdue</Alert>;
+      case (dueDate < addDays(new Date(), 2)) && (dueInXDays || 1) > 1:
+        return <Alert severity="warning">Do soon</Alert>;
+      default:
+        return <Alert severity="success">OK</Alert>;
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -56,11 +67,7 @@ export default function Chore({
         ✓ Done today
       </Button>
       Next due: {format(dueDate, "MM/dd/yyyy")}
-      {dueDate < new Date() ? (
-        <Alert severity="warning">Overdue</Alert>
-      ) : (
-        <Alert severity="success">OK</Alert>
-      )}
+      {dueStatus()}
     </Box>
   );
 }
