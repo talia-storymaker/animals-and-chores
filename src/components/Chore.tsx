@@ -56,10 +56,10 @@ export default function Chore({
         ✓ Done today
       </Button>
       Next due: {format(dueDate, "MM/dd/yyyy")}
-      {dueDate < new Date() && (
-        <Alert severity="warning">
-          Overdue
-        </Alert>
+      {dueDate < new Date() ? (
+        <Alert severity="warning">Overdue</Alert>
+      ) : (
+        <Alert severity="success">OK</Alert>
       )}
     </Box>
   );

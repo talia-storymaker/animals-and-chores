@@ -57,6 +57,7 @@ const chores: Chore[] = [
   },
   { name: "washLaundry", label: "Put laundry in washer", category: "general" },
   { name: "dryLaundry", label: "Put laundry in dryer", category: "general" },
+  { name: "foldLaundry", label: "Fold laundry", category: "general", dueInXDays: 2},
   {
     name: "feedSeanMorning",
     label: "Feed Sean (morning)",
@@ -213,6 +214,7 @@ function App() {
                         label={chore.label}
                         dayDone={choresStatus[chore.name]}
                         changeHandler={handleChange}
+                        dueInXDays={chore.dueInXDays}
                       />
                     );
                   }
