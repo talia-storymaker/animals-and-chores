@@ -1,5 +1,5 @@
 import { Box, FormLabel, TextField, Button, Alert } from "@mui/material";
-import { parse, addDays, format } from "date-fns";
+import { parse, addDays, format, isSameDay } from "date-fns";
 
 interface Props {
   name: string;
@@ -21,13 +21,18 @@ export default function Chore({
     baseDate.toString() === "Invalid Date"
       ? new Date()
       : addDays(baseDate, dueInXDays || 1);
+  const dayDoneDate = parse(dayDone, "yyyy-MM-dd", new Date());
 
   function dueStatus() {
     switch (true) {
+      case isSameDay(dayDoneDate, new Date()):
+        return <Alert severity="success">OK</Alert>;
+      case isSameDay(dueDate, new Date()):
+        return <Alert severity="warning">Do today</Alert>;
       case dueDate < new Date():
         return <Alert severity="error">Overdue</Alert>;
       case (dueDate < addDays(new Date(), 2)) && (dueInXDays || 1) > 1:
-        return <Alert severity="warning">Do soon</Alert>;
+        return <Alert severity="info">Do soon</Alert>;
       default:
         return <Alert severity="success">OK</Alert>;
     }
