@@ -1,5 +1,6 @@
 import { Box, FormLabel, TextField, Button, Alert } from "@mui/material";
 import { parse, addDays, format, isSameDay } from "date-fns";
+import { useEffect, useState } from "react";
 
 interface Props {
   name: string;
@@ -16,22 +17,48 @@ export default function Chore({
   changeHandler,
   dueInXDays,
 }: Props) {
-  const baseDate = parse(dayDone, "yyyy-MM-dd", new Date());
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+
+  useEffect(() => {
+    let timerId: number | undefined;
+
+    const scheduleMidnightUpdate = () => {
+      const now = new Date();
+      const nextMidnight = new Date(now);
+      nextMidnight.setHours(24, 0, 0, 0);
+      const msUntilMidnight = nextMidnight.getTime() - now.getTime();
+
+      timerId = window.setTimeout(() => {
+        setCurrentDate(new Date());
+        scheduleMidnightUpdate();
+      }, msUntilMidnight + 1000);
+    };
+
+    scheduleMidnightUpdate();
+
+    return () => {
+      if (timerId !== undefined) {
+        window.clearTimeout(timerId);
+      }
+    };
+  }, []);
+
+  const baseDate = parse(dayDone, "yyyy-MM-dd", currentDate);
   const dueDate =
     baseDate.toString() === "Invalid Date"
-      ? new Date()
+      ? currentDate
       : addDays(baseDate, dueInXDays || 1);
-  const dayDoneDate = parse(dayDone, "yyyy-MM-dd", new Date());
+  const dayDoneDate = parse(dayDone, "yyyy-MM-dd", currentDate);
 
   function dueStatus() {
     switch (true) {
-      case isSameDay(dayDoneDate, new Date()):
+      case isSameDay(dayDoneDate, currentDate):
         return <Alert severity="success">OK</Alert>;
-      case isSameDay(dueDate, new Date()):
+      case isSameDay(dueDate, currentDate):
         return <Alert severity="warning">Do today</Alert>;
-      case dueDate < new Date():
+      case dueDate < currentDate:
         return <Alert severity="error">Overdue</Alert>;
-      case (dueDate < addDays(new Date(), 2)) && (dueInXDays || 1) > 1:
+      case (dueDate < addDays(currentDate, 2)) && (dueInXDays || 1) > 1:
         return <Alert severity="info">Do soon</Alert>;
       default:
         return <Alert severity="success">OK</Alert>;
@@ -54,14 +81,14 @@ export default function Chore({
         value={dayDone}
         onChange={changeHandler}
         variant="outlined"
-        slotProps={{ htmlInput: { max: format(new Date(), "yyyy-MM-dd") }}}
+        slotProps={{ htmlInput: { max: format(currentDate, "yyyy-MM-dd") }}}
       />
       <Button
         variant="contained"
         color="primary"
         size="large"
         onClick={() => {
-          const today = format(new Date(), "yyyy-MM-dd");
+          const today = format(currentDate, "yyyy-MM-dd");
 
           const fakeEvent = {
             target: { name, value: today },
@@ -69,7 +96,7 @@ export default function Chore({
 
           changeHandler?.(fakeEvent);
         }}
-        disabled={isSameDay(dayDoneDate, new Date())}
+        disabled={isSameDay(dayDoneDate, currentDate)}
       >
         ✓ Done today
       </Button>
