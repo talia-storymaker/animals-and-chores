@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useReducer } from "react";
 import {
   Container,
   Typography,
@@ -141,27 +141,47 @@ const initialChoresStatus: ChoreStatus = Object.fromEntries(
   chores.map((chore) => [chore.name, ""]),
 ) as ChoreStatus;
 
-function App() {
-  const [choresStatus, setChoresStatus] = useState(initialChoresStatus);
+type ChoreAction =
+  | { type: "load"; payload: ChoreStatus }
+  | { type: "update"; name: ChoreName; value: string }
+  | { type: "reset" };
 
-  useEffect(() => {
-    chores.forEach((chore) => {
-      const savedValue = localStorage.getItem(chore.name);
-      if (savedValue) {
-        setChoresStatus((prev) => ({
-          ...prev,
-          [chore.name]: savedValue,
-        }));
-      }
-    });
-  }, []);
+function getInitialChoresStatus(): ChoreStatus {
+  const status = { ...initialChoresStatus };
+
+  chores.forEach((chore) => {
+    const savedValue = localStorage.getItem(chore.name);
+    if (savedValue) {
+      status[chore.name] = savedValue;
+    }
+  });
+
+  return status;
+}
+
+function choresReducer(state: ChoreStatus, action: ChoreAction): ChoreStatus {
+  switch (action.type) {
+    case "load":
+      return { ...state, ...action.payload };
+    case "update":
+      return { ...state, [action.name]: action.value };
+    case "reset":
+      return initialChoresStatus;
+    default:
+      return state;
+  }
+}
+
+function App() {
+  const [choresStatus, dispatch] = useReducer(
+    choresReducer,
+    initialChoresStatus,
+    getInitialChoresStatus,
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setChoresStatus((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    dispatch({ type: "update", name: name as ChoreName, value });
     localStorage.setItem(name, value);
   };
 
